@@ -1,36 +1,24 @@
-// collection of actions to look which events going to occur in our event
 
-{
-    type: 'ADD_TODO',
-    todo: {
-      id: 0,
-      name: 'Learn Redux',
-      complete: false,
+// updating the state 
+function todos(state = [], action){
+    switch(action.type){
+        case 'ADD_TODO':
+            // the reason we didn't use push is, bcs this function should be a pure funtion. 
+            //Not modifying the existing state but returning a new one.
+            return state.concat([action.todo])
+        case 'REMOVE_TODO':
+            // it will loop over each item in the state array, and filter one out
+            return state.filter((todo) => todo.id !== action.id)
+        case 'TOGGLE_TODO':
+            // instead of hard coding each property we want to toggle, 
+            //object.assign which allows us to merge different objects together
+            return state.map((todo) = todo.id !== action.id ? todo : 
+            Object.assign({},todo,{complete: !todo.complete}))
+            // says create me brand new object, get and merge todo object, but change the complete property
+        default:
+            return state;
+            }  
     }
-  }
-  {
-    type: 'REMOVE_TODO',
-    id: 0,
-  }
-  
-  {
-    type: 'TOGGLE_TODO',
-    id: 0,
-  }
-  
-  {
-    type: 'ADD_GOAL',
-    goal: {
-      id: 0,
-      name: 'Run a Marathon'
-    }
-  }
-  
-  {
-    type: 'REMOVE_GOAL',
-    id: 0
-  }
-}
 
 
 
