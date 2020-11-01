@@ -1,3 +1,39 @@
+// collection of actions to look which events going to occur in our event
+
+{
+    type: 'ADD_TODO',
+    todo: {
+      id: 0,
+      name: 'Learn Redux',
+      complete: false,
+    }
+  }
+  {
+    type: 'REMOVE_TODO',
+    id: 0,
+  }
+  
+  {
+    type: 'TOGGLE_TODO',
+    id: 0,
+  }
+  
+  {
+    type: 'ADD_GOAL',
+    goal: {
+      id: 0,
+      name: 'Run a Marathon'
+    }
+  }
+  
+  {
+    type: 'REMOVE_GOAL',
+    id: 0
+  }
+}
+
+
+
 function createStore(){
     // store should have 4 parts 
     // 1. state
