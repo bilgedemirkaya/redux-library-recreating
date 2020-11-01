@@ -19,10 +19,25 @@ function todos(state = [], action){
             return state;
             }  
     }
+function goals(state = [], action){
+    switch(action.type){
+        case 'ADD_GOAL':
+            return state.concat([action.goal])
+        case 'REMOVE_GOAL':
+            return state.filter((goal) => goal.id !== action.id)
+        default: 
+            return state;
+    }
+}
 
+function app(state={},action){
+    return{
+        todos: todos(state.todos,action),
+        goals: goals(state.goals,action)
+    }
+}
 
-
-function createStore(){
+function createStore(reducer){
     // store should have 4 parts 
     // 1. state
     // 2. get state
@@ -46,7 +61,39 @@ function createStore(){
         }
     }
 
+    // it takes the action, calls the reducer functions which updates the state, notify the listeners
+    const dispatch = (action) => {
+        // in here we call the reducer function but now we don't have a single function but two: goal and todo
+        // so we need to make another function which gives us both functions with one funct.
+        state = reducer(state,action)
+        listeners.forEach((listener) => listener())
+    }
+
     return {
-        getState
+        getState,
+        subscribe,
+        dispatch
     }
 }
+
+const store = createStore(app)
+
+store.subscribe(() => {
+    console.log("THE NEW STATE IS", store.getState())
+})
+
+store.dispatch({
+    type: 'ADD_TODO',
+    todo: {
+      id: 0,
+      name: 'Walk the dog',
+      complete: false,
+    }
+  })
+  store.dispatch({
+    type: 'ADD_GOAL',
+    goal: {
+      id: 0,
+      name: 'Learn Redux'
+    }
+  })
