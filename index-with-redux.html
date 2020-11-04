@@ -67,6 +67,29 @@
             id,
             }
         }
+        // middleware
+        function checker(store){
+            return function(next){
+                return function(action){
+                    if(
+                        action.type === ADD_TODO && 
+                        action.todo.name.toLowerCase().indexOf('bitcoin') !== -1 //means input contains bitcoin
+                    ){
+                        return alert('Nope.It is a bad idea')
+                    }
+                    if(
+                        action.type === ADD_GOAL && 
+                        action.todo.name.toLowerCase().indexOf('bitcoin') !== -1 //means input contains bitcoin
+                    ){
+                        return alert('Nope.It is a bad idea')
+                    }
+
+                    }
+                return next(action) // will go to next middleware if there is one or will go to reducer
+            }
+            
+
+        }
             // updating the state 
             function todos(state = [], action){
             switch(action.type){
@@ -105,7 +128,7 @@
         const store = Redux.createStore(Redux.combineReducers({
             todos,
             goals
-        }))
+        }), Redux.applyMiddleware(checker))
         
         store.subscribe(() => {
             const {todos, goals} = store.getState()
