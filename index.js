@@ -22,15 +22,14 @@ function createStore(reducer){
             listeners = listeners.filter((l) => l !== listener)
         }
     }
-
     // it takes the action, calls the reducer functions which updates the state, notify the listeners
+    
     const dispatch = (action) => {
         // in here we call the reducer function but now we don't have a single function but two: goal and todo
         // so we need to make another function which gives us both functions with one funct.
         state = reducer(state,action)
         listeners.forEach((listener) => listener())
     }
-
     return {
         getState,
         subscribe,
@@ -38,6 +37,7 @@ function createStore(reducer){
     }
 }
 
+// app code
 const ADD_TODO = 'ADD_TODO'
 const REMOVE_TODO = 'REMOVE_TODO'
 const TOGGLE_TODO = 'TOGGLE_TODO'
@@ -78,6 +78,7 @@ function addTodoAction (todo) {
       id,
     }
   }
+
 // updating the state 
 function todos(state = [], action){
     switch(action.type){
@@ -110,6 +111,7 @@ function goals(state = [], action){
     }
 }
 
+// combine reducers
 function app(state={},action){
     return{
         todos: todos(state.todos,action),
@@ -117,10 +119,7 @@ function app(state={},action){
     }
 }
 
-
 const store = createStore(app)
-
-
 
 store.subscribe(() => {
     console.log("THE NEW STATE IS", store.getState())

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title> Todos & Goals </title>
+    </head>
+    <body>
+
+        <div> 
+            <h2>TODO</h2>
+            <input type="text" placeholder="Add Todo..." id="todo"> </input>
+            <button id="todoBtn"> Add todo </button>
+            <ul id="todolist">
+            </ul>
+        </div>
+        <div>
+            <h2> GOAL </h2>
+            <input type="text" placeholder="Add Goal..." id="goal"> </input>
+            <button id="goalBtn"> Add goal </button>
+            <ul id="goallist"></ul>
+        </div>
+
+        <script type="text/javascript">
+
+            function generateId () {
+                 return Math.random().toString(36).substring(2) + (new Date()).getTime().toString(36)
+             }
+            
+            // library code
+            function createStore(reducer){
+            // store should have 4 parts 
+            // 1. state
+            // 2. get state
+            // 3. listen to changes of states
+            // 4. update the state
+
+            let state;
+            let listeners = []
+
+            const getState = () => state;
+
+            // when a user calls subscribe passing it a function, that function is goind to be pushed on our listeners array
+            // but then, if the user calls this function that was returned to them when they call subscribe, ehat is going to happen is 
+            // we are going to filter our listeners array, just remove the initial function that we just passed in when they first invoked subscribe.
+            // so if we do const unsubscribe = store.subscribe() etc , it will return the unsubscribed array.
+            
+            const subscribe = (listener) => {
+                listeners.push(listener)
+                return () => {
+                    listeners = listeners.filter((l) => l !== listener)
+                }
+            }
+
+            // it takes the action, calls the reducer functions which updates the state, and notify the listeners
+            const dispatch = (action) => {
+                // in here we call the reducer function but now we don't have a single function but two: goal and todo
+                // so we need to make another function which gives us both functions with one funct.
+                state = reducer(state,action)
+                listeners.forEach((listener) => listener())
+            }
+
+            return {
+                getState,
+                subscribe,
+                dispatch
+            }
+            }
+
+            const ADD_TODO = 'ADD_TODO'
+            const REMOVE_TODO = 'REMOVE_TODO'
+            const TOGGLE_TODO = 'TOGGLE_TODO'
+            const ADD_GOAL = 'ADD_GOAL'
+            const REMOVE_GOAL = 'REMOVE_GOAL'
+
+            function addTodoAction (todo) {
+            return {
+            type: ADD_TODO,
+            todo,
+            }
+        }
+        
+        function removeTodoAction (id) {
+            return {
+            type: REMOVE_TODO,
+            id,
+            }
+        }
+        
+        function toggleTodoAction (id) {
+            return {
+            type: TOGGLE_TODO,
+            id,
+            }
+        }
+        
+        function addGoalAction (goal) {
+            return {
+            type: ADD_GOAL,
+            goal,
+            }
+        }
+        
+        function removeGoalAction (id) {
+            return {
+            type: REMOVE_GOAL,
+            id,
+            }
+        }
+            // updating the state 
+            function todos(state = [], action){
+            switch(action.type){
+                case ADD_TODO:
+                    // the reason we didn't use push is, bcs this function should be a pure funtion. 
+                    //Not modifying the existing state but returning a new one.
+                    return state.concat([action.todo])
+                case REMOVE_TODO:
+                    // it will loop over each item in the state array, and filter one out
+                    return state.filter((todo) => todo.id !== action.id)
+                case TOGGLE_TODO:
+                    // instead of hard coding each property we want to toggle, 
+                    //object.assign which allows us to merge different objects together
+                    return state.map((todo) = todo.id !== action.id ? todo : 
+                    Object.assign({},todo,{complete: !todo.complete}))
+                    // says create me brand new object, get and merge todo object, but change the complete property
+                default:
+                    return state;
+                    }  
+            }
+
+        function goals(state = [], action){
+            switch(action.type){
+                case ADD_GOAL:
+                    return state.concat([action.goal])
+                case REMOVE_GOAL:
+                    return state.filter((goal) => goal.id !== action.id)
+                default: 
+                    return state;
+            }
+        }
+
+        function app(state={},action){
+            return{
+                todos: todos(state.todos,action),
+                goals: goals(state.goals,action)
+            }
+        }
+
+
+        const store = createStore(app)
+        
+        store.subscribe(() => {
+            const {todos, goals} = store.getState()
+            document.getElementById('todolist').innerHTML = ''
+            document.getElementById('goallist').innerHTML = ''
+            todos.forEach(addTodoToDom)
+            goals.forEach(addGoalToDom,createRemoveButton)
+        })
+
+        function createRemoveButton(Onclick){
+            const button = document.createElement('button');
+            button.innerHTML = ' x ';
+            button.addEventListener('click', Onclick)
+
+            return button
+
+        }
+
+        function addTodoToDom(todo){
+            const node = document.createElement('li')
+            const text = document.createTextNode(todo.name)
+            node.append(text)
+            node.append(" ")
+
+            const removeBtn = createRemoveButton(() => {
+                store.dispatch(removeTodoAction(todo.id)) // we passed the onclick function as parameter!! 
+                // so when it is clicked, automatically runned the dispatch function.
+            })
+
+            node.appendChild(removeBtn)
+
+            document.getElementById('todolist').appendChild(node)
+        }
+
+        function addGoalToDom(goal){
+            const node = document.createElement('li')
+            const text = document.createTextNode(goal.name)
+            node.appendChild(text)
+            node.append(" ")
+            const removeBtn = createRemoveButton(() => {
+                store.dispatch(removeGoalAction(goal.id))
+            })
+            node.appendChild(removeBtn)
+            document.getElementById('goallist').appendChild(node)
+        }
+
+        function addTodo(){
+            const input = document.getElementById('todo')
+            const name = input.value
+            input.value = ''
+            store.dispatch(addTodoAction({
+                id:generateId(),
+                name,
+                complete:false
+        }))
+        }
+        function addGoal(){
+            const input = document.getElementById('goal')
+            const name = input.value
+            input.value = ''
+            store.dispatch(addGoalAction({
+                id:generateId(),
+                name,
+        }))
+        }
+
+        document.getElementById('todoBtn').addEventListener('click',addTodo)
+        document.getElementById('goalBtn').addEventListener('click',addGoal)
+    </script>
+</body>
+</html>
