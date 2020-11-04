@@ -118,8 +118,9 @@
                 case TOGGLE_TODO:
                     // instead of hard coding each property we want to toggle, 
                     //object.assign which allows us to merge different objects together
-                    return state.map((todo) = todo.id !== action.id ? todo : 
-                    Object.assign({},todo,{complete: !todo.complete}))
+                    return state.map((todo) => todo.id !== action.id ? todo :
+                        Object.assign({}, todo, {complete: !todo.complete})
+                    )
                     // says create me brand new object, get and merge todo object, but change the complete property
                 default:
                     return state;
@@ -152,7 +153,8 @@
             document.getElementById('todolist').innerHTML = ''
             document.getElementById('goallist').innerHTML = ''
             todos.forEach(addTodoToDom)
-            goals.forEach(addGoalToDom,createRemoveButton)
+            goals.forEach(addGoalToDom)
+            todos.forEach((todo) => console.log(todo.name)) // this will give us {1,1,2,1,2,3..} array bcs we use concat which is returning a new array bcs it is a pure function
         })
 
         function createRemoveButton(Onclick){
@@ -169,13 +171,17 @@
             const text = document.createTextNode(todo.name)
             node.append(text)
             node.append(" ")
-
             const removeBtn = createRemoveButton(() => {
                 store.dispatch(removeTodoAction(todo.id)) // we passed the onclick function as parameter!! 
                 // so when it is clicked, automatically runned the dispatch function.
             })
-
             node.appendChild(removeBtn)
+
+            // toggle todo here, not in store
+            node.style.textDecoration = todo.complete ? 'line-through' : 'none'
+            node.addEventListener('click', () => {
+                store.dispatch(toggleTodoAction(todo.id))
+            })
 
             document.getElementById('todolist').appendChild(node)
         }
@@ -214,6 +220,8 @@
 
         document.getElementById('todoBtn').addEventListener('click',addTodo)
         document.getElementById('goalBtn').addEventListener('click',addGoal)
+
+        
     </script>
 </body>
 </html>
