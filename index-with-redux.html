@@ -3,6 +3,9 @@
     <head>
         <title> Todos & Goals </title>
         <script src='https://cdnjs.cloudflare.com/ajax/libs/redux/4.0.5/redux.min.js'></script>
+        <script src='https://unpkg.com/react@16.13.1/umd/react.development.js'></script>
+        <script src='https://unpkg.com/react-dom@16.13.1/umd/react-dom.development.js'></script>
+        <script src='https://unpkg.com/babel-standalone@6.26.0/babel.min.js'></script>
     </head>
     <body>
         <div> 
@@ -18,6 +21,9 @@
             <button id="goalBtn"> Add goal </button>
             <ul id="goallist"></ul>
         </div>
+        <hr>
+
+        <div id="app"></div> <!--to mount react code-->
 
         <script type="text/javascript">
 
@@ -68,28 +74,24 @@
             }
         }
         // middleware
-        function checker(store){
-            return function(next){
-                return function(action){
-                    if(
-                        action.type === ADD_TODO && 
-                        action.todo.name.toLowerCase().indexOf('bitcoin') !== -1 //means input contains bitcoin
-                    ){
-                        return alert('Nope.It is a bad idea')
-                    }
-                    if(
-                        action.type === ADD_GOAL && 
-                        action.todo.name.toLowerCase().indexOf('bitcoin') !== -1 //means input contains bitcoin
-                    ){
-                        return alert('Nope.It is a bad idea')
-                    }
-
-                    }
-                return next(action) // will go to next middleware if there is one or will go to reducer
+        const checker = (store) => (next) => (action) => {
+            if (
+                action.type === ADD_TODO &&
+                action.todo.name.toLowerCase().indexOf('bitcoin') !== -1
+            ) {
+                return alert("Nope. That's a bad idea.")
             }
-            
 
-        }
+            if (
+                action.type === ADD_GOAL &&
+                action.goal.name.toLowerCase().indexOf('bitcoin') !== -1
+            ) {
+                return alert("Nope. That's a bad idea.")
+            }
+
+            return next(action)
+    }
+            
             // updating the state 
             function todos(state = [], action){
             switch(action.type){
@@ -136,7 +138,7 @@
             document.getElementById('goallist').innerHTML = ''
             todos.forEach(addTodoToDom)
             goals.forEach(addGoalToDom)
-            todos.forEach((todo) => console.log(todo.name)) // this will give us {1,1,2,1,2,3..} array bcs we use concat which is returning a new array bcs it is a pure function
+          //  todos.forEach((todo) => console.log(todo.name)) // this will give us {1,1,2,1,2,3..} array bcs we use concat which is returning a new array bcs it is a pure function
         })
 
         function createRemoveButton(Onclick){
@@ -203,7 +205,97 @@
         document.getElementById('todoBtn').addEventListener('click',addTodo)
         document.getElementById('goalBtn').addEventListener('click',addGoal)
 
-        
     </script>
+    <script type="text/babel">
+
+        function List (props){
+            return (
+                <ul>
+                     {props.items.map((item) => (
+                         <li key={item.id}>
+                            {item.name}
+                        </li>
+                     ))} 
+                </ul>
+            )
+            
+        }
+
+        class Todo extends React.Component{
+
+            addItem = (e) => {
+                e.preventDefault()
+                const name = this.input.value
+                this.input.value = ' '
+                console.log(this.props.todos.name)
+
+                this.props.store.dispatch(addTodoAction({
+                    id:generateId(),
+                    name,
+                    complete:false
+                }))
+            }
+            render(){
+               
+                return (
+                    <div>
+                        <h2>TODO</h2>
+                        <input type="text" placeholder="Add Todo..." ref={(input) => this.input = input}/>
+                        <button id="todoBtn-0" onClick={this.addItem}> Add todo </button>
+                        <List items={this.props.todos}/>
+                    </div>
+                )
+            }
+        }
+
+        class Goal extends React.Component{
+            addItem = (e) => {
+                e.preventDefault()
+                const name = this.input.value;
+                this.input.value = ' ';
+                console.log(this.props.goals)
+                this.props.store.dispatch(addGoalAction({
+                    id: generateId(),
+                    name
+                }))
+            }
+            render(){
+                return (
+                    <div>
+                        <h2>GOAL</h2>
+                        <input type="text" placeholder="Add Goal..." ref={(input) => this.input = input} /> 
+                        <button id="goalBtn-1" onClick={this.addItem}> Add Goal </button>
+                        <List items={this.props.goals}/>
+                    </div>
+                )
+            }
+        }
+
+        class App extends React.Component {
+
+            componentDidMount () {
+            const { store } = this.props
+
+            store.subscribe(() => this.forceUpdate())
+      }
+
+            render(){
+                const { store } = this.props 
+                const { todos, goals } = store.getState()
+                return (
+                    <div>
+                        <Todo todos={todos} store={store}/>
+                        <Goal goals={goals} store={store}/>
+                    </div>
+                )
+            }
+        }
+
+        ReactDOM.render(
+            <App store ={store}/>,
+            document.getElementById('app')
+        )
+
+        </script>
 </body>
 </html>
