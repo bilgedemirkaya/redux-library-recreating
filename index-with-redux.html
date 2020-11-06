@@ -209,16 +209,17 @@
     <script type="text/babel">
 
         function List (props){
+            // when x button clicked it will pass the spesific item that should be removed from store
             return (
                 <ul>
                      {props.items.map((item) => (
                          <li key={item.id}>
-                            {item.name}
+                          <span> {item.name} </span> 
+                          <button onClick={() => props.remove(item)}> x </button> 
                         </li>
                      ))} 
                 </ul>
-            )
-            
+            ) 
         }
 
         class Todo extends React.Component{
@@ -235,6 +236,10 @@
                     complete:false
                 }))
             }
+
+            removeItem = (todo) => {
+              this.props.store.dispatch(removeGoalAction(todo.id))
+           }
             render(){
                
                 return (
@@ -242,7 +247,7 @@
                         <h2>TODO</h2>
                         <input type="text" placeholder="Add Todo..." ref={(input) => this.input = input}/>
                         <button id="todoBtn-0" onClick={this.addItem}> Add todo </button>
-                        <List items={this.props.todos}/>
+                        <List items={this.props.todos} remove={this.removeItem}/>
                     </div>
                 )
             }
@@ -253,19 +258,22 @@
                 e.preventDefault()
                 const name = this.input.value;
                 this.input.value = ' ';
-                console.log(this.props.goals)
                 this.props.store.dispatch(addGoalAction({
                     id: generateId(),
                     name
                 }))
             }
+            removeItem = (goal) => {
+              this.props.store.dispatch(removeGoalAction(goal.id))
+           }
             render(){
                 return (
                     <div>
-                        <h2>GOAL</h2>
+                        <h2> GOAL </h2>
                         <input type="text" placeholder="Add Goal..." ref={(input) => this.input = input} /> 
                         <button id="goalBtn-1" onClick={this.addItem}> Add Goal </button>
-                        <List items={this.props.goals}/>
+                        <List items={this.props.goals} 
+                             remove={this.removeItem}/>
                     </div>
                 )
             }
@@ -276,7 +284,7 @@
             componentDidMount () {
             const { store } = this.props
 
-            store.subscribe(() => this.forceUpdate())
+            store.subscribe(() => this.forceUpdate()) // will cause a rerender everytime store updates
       }
 
             render(){
