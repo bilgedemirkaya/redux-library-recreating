@@ -223,8 +223,9 @@
         }
 
         class Todo extends React.Component{
-
+           
             addItem = (e) => {
+                const {todos, goals} = this.props.store.getState()
                 e.preventDefault()
                 const name = this.input.value
                 this.input.value = ' '
@@ -235,6 +236,12 @@
                     name,
                     complete:false
                 }))
+                todos.map((todo => {
+                todo.textDecoration = todo.complete ? 'line-through' : 'none'
+                todo.addEventListener('click', () => {
+                store.dispatch(toggleTodoAction(todo.id))
+                })
+            }))
             }
 
             removeItem = (todo) => {
