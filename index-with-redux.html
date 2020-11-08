@@ -124,12 +124,21 @@
                     return state;
             }
         }
+        function loading(state=true,action){
+            switch(action.type){
+                case RECEIVE_DATA: // If we get data from API
+                    return false
+                default:
+                    return state
+            }
+        }
 
 
 
         const store = Redux.createStore(Redux.combineReducers({
             todos,
-            goals
+            goals,
+            loading
         }), Redux.applyMiddleware(checker))
         
 
@@ -236,12 +245,17 @@
                 // console.log(todos,goals)
                 store.dispatch(receiveData(todos,goals))
             })
-
+           
             store.subscribe(() => this.forceUpdate()) // will cause a rerender everytime store updates
       }
             render(){
                 const { store } = this.props 
-                const { todos, goals } = store.getState()
+                const { todos, goals, loading } = store.getState()
+                if(loading){
+                return (
+                    <h3>Loading..</h3>
+                )
+            }
                 return (
                     <div>
                         <Todo todos={todos} store={store}/>
