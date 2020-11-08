@@ -6,6 +6,7 @@
         <script src='https://unpkg.com/react@16.13.1/umd/react.development.js'></script>
         <script src='https://unpkg.com/react-dom@16.13.1/umd/react-dom.development.js'></script>
         <script src='https://unpkg.com/babel-standalone@6.26.0/babel.min.js'></script>
+        <script src='https://ui.dev/goals-todos-api/index.js'></script>
     </head>
     <body>
 
@@ -24,6 +25,7 @@
             const TOGGLE_TODO = 'TOGGLE_TODO'
             const ADD_GOAL = 'ADD_GOAL'
             const REMOVE_GOAL = 'REMOVE_GOAL'
+            const RECEIVE_DATA = 'RECEIVE_DATA'
 
             function addTodoAction (todo) {
             return {
@@ -57,6 +59,13 @@
             return {
             type: REMOVE_GOAL,
             id,
+            }
+        }
+        function receiveData(todos,goals){
+            return {
+                type: RECEIVE_DATA,
+                todos,
+                goals, 
             }
         }
         // middleware
@@ -95,6 +104,9 @@
                         Object.assign({}, todo, {complete: !todo.complete})
                     )
                     // says create me brand new object, get and merge todo object, but change the complete property
+                case RECEIVE_DATA:
+                    return action.todos // get the array of todos from API
+
                 default:
                     return state;
                     }  
@@ -106,6 +118,8 @@
                     return state.concat([action.goal])
                 case REMOVE_GOAL:
                     return state.filter((goal) => goal.id !== action.id)
+                case RECEIVE_DATA:
+                    return action.goals // array of goals from API
                 default: 
                     return state;
             }
@@ -214,10 +228,17 @@
 
             componentDidMount () {
             const { store } = this.props
+            // fetch the data from API
+            Promise.all([
+                API.fetchTodos(),
+                API.fetchGoals(),
+            ]).then(([todos, goals]) => {
+                // console.log(todos,goals)
+                store.dispatch(receiveData(todos,goals))
+            })
 
             store.subscribe(() => this.forceUpdate()) // will cause a rerender everytime store updates
       }
-
             render(){
                 const { store } = this.props 
                 const { todos, goals } = store.getState()
