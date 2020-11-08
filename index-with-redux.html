@@ -168,15 +168,13 @@
             addItem = (e) => {
                 const {todos, goals} = this.props.store.getState()
                 e.preventDefault()
-                const name = this.input.value
-                this.input.value = ' '
-                console.log(this.props.todos.name)
 
-                this.props.store.dispatch(addTodoAction({
-                    id:generateId(),
-                    name,
-                    complete:false
-                }))
+                return API.saveTodo(this.input.value) // add todo in server and return us a new todo with id name and complete properties
+                .then ((todo) => {
+                    this.input.value = ''
+                    this.props.store.dispatch(addTodoAction(todo)) // will add the new todo item in UI
+                })
+
                 todos.map((todo => {
                 todo.textDecoration = todo.complete ? 'line-through' : 'none'
                 todo.addEventListener('click', () => {
@@ -198,7 +196,7 @@
             toggleItem = (id) => {
                 // toggle from UI
                this.props.store.dispatch(toggleTodoAction(id))
-               return API.saveTodoTogglegit (id)
+               return API.saveTodoToggle(id)
                .catch(() => {
                    this.props.store.dispatch(toggleTodoAction(id)) 
                    alert('Error toggling')
@@ -223,12 +221,13 @@
         class Goal extends React.Component{
             addItem = (e) => {
                 e.preventDefault()
-                const name = this.input.value;
-                this.input.value = ' ';
-                this.props.store.dispatch(addGoalAction({
-                    id: generateId(),
-                    name
-                }))
+                // save the server
+                return API.saveGoal(this.input.value)
+                .then((goal) => { 
+                    // save in UI
+                    this.props.store.dispatch(addGoalAction(goal))
+                    this.input.value =' '
+                })
             }
             removeItem = (goal) => {
               this.props.store.dispatch(removeGoalAction(goal.id))
