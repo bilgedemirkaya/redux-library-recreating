@@ -82,6 +82,61 @@
                  })
             }
         }
+
+        function handleDeleteGoal(goal){
+            return (dispatch) => {
+                dispatch(removeGoalAction(goal.id))
+                return API.deleteGoal(goal.id)
+                .catch(() => {
+                    dispatch(addGoalAction(goal))
+                    alert('Error occured, try again.')
+                })
+            }
+        }
+
+        function handleAddGoal(name,cb){ // input value and a function to reset input
+            return (dispatch) => {
+               // save the server
+               return API.saveGoal(name)
+                .then((goal) => { 
+                    dispatch(addGoalAction(goal))
+                    cb()
+                })
+                .catch(() => alert('There was an error. Try again.'))
+            } 
+        }
+        function handleAddTodo(name,cb){
+            return (dispatch) => {
+                return API.saveTodo(name) // add todo in server and return us a new todo with id name and complete properties
+                .then ((todo) => {                   
+                    dispatch(addTodoAction(todo)) // will add the new todo item in UI
+                    cb() // reset the value of input
+                })
+                .catch(() => alert('There was an error. Try again.'))
+            }
+        }
+        function handleToggleTodo(id){
+            return (dispatch) => {
+                dispatch(toggleTodoAction(id))
+                return API.saveTodoToggle(id)
+                .catch(() => {
+                   dispatch(toggleTodoAction(id)) 
+                   alert('Error toggling')
+               })
+            }
+        }
+        function handleInitialData(){
+            return (dispatch) => {
+                Promise.all([
+                API.fetchTodos(),
+                API.fetchGoals(),
+            ]).then(([todos, goals]) => {
+                // console.log(todos,goals)
+                dispatch(receiveData(todos,goals))
+            })
+            }
+        }
+
         // middleware
         const checker = (store) => (next) => (action) => {
             if (
@@ -184,21 +239,12 @@
         class Todo extends React.Component{
            
             addItem = (e) => {
-                const {todos, goals} = this.props.store.getState()
+                
                 e.preventDefault()
-
-                return API.saveTodo(this.input.value) // add todo in server and return us a new todo with id name and complete properties
-                .then ((todo) => {
-                    this.input.value = ''
-                    this.props.store.dispatch(addTodoAction(todo)) // will add the new todo item in UI
-                })
-
-                todos.map((todo => {
-                todo.textDecoration = todo.complete ? 'line-through' : 'none'
-                todo.addEventListener('click', () => {
-                store.dispatch(toggleTodoAction(todo.id))
-                })
-            }))
+                this.props.store.dispatch(handleAddTodo(
+                    this.input.value,
+                    () => {this.input.value = ''}
+                ))                
             }
             removeItem = (todo) => {
             // moved our api logic inside of handleDeleteTodo to better clean code.
@@ -206,12 +252,7 @@
            }
             toggleItem = (id) => {
                 // toggle from UI
-               this.props.store.dispatch(toggleTodoAction(id))
-               return API.saveTodoToggle(id)
-               .catch(() => {
-                   this.props.store.dispatch(toggleTodoAction(id)) 
-                   alert('Error toggling')
-               })
+               this.props.store.dispatch(handleToggleTodo(id))
            }
             render(){
                
@@ -232,21 +273,14 @@
         class Goal extends React.Component{
             addItem = (e) => {
                 e.preventDefault()
-                // save the server
-                return API.saveGoal(this.input.value)
-                .then((goal) => { 
-                    // save in UI
-                    this.props.store.dispatch(addGoalAction(goal))
-                    this.input.value =' '
-                })
+
+                this.props.store.dispatch(handleAddGoal(
+                    this.input.value,
+                    () => { this.input.value = ''},
+                    ))
             }
             removeItem = (goal) => {
-              this.props.store.dispatch(removeGoalAction(goal.id))
-              return API.deleteGoal(goal)
-              .catch(() => { 
-                  this.props.store.dispatch(addGoalAction(goal))
-                  alert('Error occured, try again.')
-              })
+              this.props.store.dispatch(handleDeleteGoal(goal))
            }
             render(){
                 return (
@@ -266,13 +300,7 @@
             componentDidMount () {
             const { store } = this.props
             // fetch the data from API
-            Promise.all([
-                API.fetchTodos(),
-                API.fetchGoals(),
-            ]).then(([todos, goals]) => {
-                // console.log(todos,goals)
-                store.dispatch(receiveData(todos,goals))
-            })
+            store.dispatch(handleInitialData())
            
             store.subscribe(() => this.forceUpdate()) // will cause a rerender everytime store updates
       }
@@ -297,7 +325,6 @@
             <App store ={store}/>,
             document.getElementById('app')
         )
-
         </script>
 </body>
 </html>
