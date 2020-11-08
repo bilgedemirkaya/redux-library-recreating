@@ -184,12 +184,25 @@
                 })
             }))
             }
-
             removeItem = (todo) => {
-              this.props.store.dispatch(removeTodoAction(todo.id))
+                // first delete from UI
+                this.props.store.dispatch(removeTodoAction(todo.id))
+                // delete from server
+                return API.deleteTodo(todo.id)
+                .catch(() => { // if an error
+                   this.props.store.dispatch(addTodoAction(todo))  // add it back
+                   alert('Error occured, try again.')
+                })
+              
            }
-           toggleItem = (id) => {
+            toggleItem = (id) => {
+                // toggle from UI
                this.props.store.dispatch(toggleTodoAction(id))
+               return API.saveTodoTogglegit (id)
+               .catch(() => {
+                   this.props.store.dispatch(toggleTodoAction(id)) 
+                   alert('Error toggling')
+               })
            }
             render(){
                
@@ -219,6 +232,11 @@
             }
             removeItem = (goal) => {
               this.props.store.dispatch(removeGoalAction(goal.id))
+              return API.deleteGoal(goal)
+              .catch(() => { 
+                  this.props.store.dispatch(addGoalAction(goal))
+                  alert('Error occured, try again.')
+              })
            }
             render(){
                 return (
