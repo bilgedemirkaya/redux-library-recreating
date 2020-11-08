@@ -68,6 +68,20 @@
                 goals, 
             }
         }
+        function handleDeleteTodo(todo){
+            // this time in this action creator, we need to return not just an object but we need to invoke a function 
+            //so instead, we return a function.
+            return (dispatch) => {
+                 // delete from UI
+                 dispatch(removeTodoAction(todo.id)) // this time we pass dispatch in the function as parameter 
+                // delete from server
+                return API.deleteTodo(todo.id)
+                .catch(() => { // if an error
+                   dispatch(addTodoAction(todo))  // add it back
+                   alert('Error occured, try again.')
+                 })
+            }
+        }
         // middleware
         const checker = (store) => (next) => (action) => {
             if (
@@ -83,9 +97,18 @@
             ) {
                 return alert("Nope. That's a bad idea.")
             }
-
             return next(action)
-    }
+        }
+        // middleware for 'seperating API code from the component and adding in the action itself' logic.
+        const thunk = (store) => (next) => (action) => {
+            if (typeof action === 'function'){
+                // if the action is a function rather than an object then we will invoke it with dispatch
+                return action(store.dispatch)
+
+            }
+            //otherwise we will just return the next action
+            return next(action)
+        }
             
             // updating the state 
             function todos(state = [], action){
@@ -132,17 +155,12 @@
                     return state
             }
         }
-
-
-
         const store = Redux.createStore(Redux.combineReducers({
             todos,
             goals,
             loading
-        }), Redux.applyMiddleware(checker))
+        }), Redux.applyMiddleware(checker,thunk))
         
-
-
     </script>
     <script type="text/babel">
 
@@ -183,15 +201,8 @@
             }))
             }
             removeItem = (todo) => {
-                // first delete from UI
-                this.props.store.dispatch(removeTodoAction(todo.id))
-                // delete from server
-                return API.deleteTodo(todo.id)
-                .catch(() => { // if an error
-                   this.props.store.dispatch(addTodoAction(todo))  // add it back
-                   alert('Error occured, try again.')
-                })
-              
+            // moved our api logic inside of handleDeleteTodo to better clean code.
+            this.props.store.dispatch(handleDeleteTodo(todo))
            }
             toggleItem = (id) => {
                 // toggle from UI
