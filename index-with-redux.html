@@ -239,23 +239,22 @@
             ) 
         }
 
-        class Todo extends React.Component{
+        class Todos extends React.Component{
            
             addItem = (e) => {
-                
                 e.preventDefault()
-                this.props.store.dispatch(handleAddTodo(
+                this.props.dispatch(handleAddTodo(
                     this.input.value,
                     () => {this.input.value = ''}
                 ))                
             }
             removeItem = (todo) => {
             // moved our api logic inside of handleDeleteTodo to better clean code.
-            this.props.store.dispatch(handleDeleteTodo(todo))
+            this.props.dispatch(handleDeleteTodo(todo))
            }
             toggleItem = (id) => {
                 // toggle from UI
-               this.props.store.dispatch(handleToggleTodo(id))
+                this.props.dispatch(handleToggleTodo(id))
            }
             render(){
                
@@ -273,17 +272,23 @@
             }
         }
 
-        class Goal extends React.Component{
+       const ConnectedTodos = connect((state) => ({
+            // ** whenever we make a connector, this component will access to the dispatch
+            todos: state.todos
+        }))(Todos)
+
+
+        class Goals extends React.Component{
             addItem = (e) => {
                 e.preventDefault()
 
-                this.props.store.dispatch(handleAddGoal(
+                this.props.dispatch(handleAddGoal(
                     this.input.value,
                     () => { this.input.value = ''},
                     ))
             }
             removeItem = (goal) => {
-              this.props.store.dispatch(handleDeleteGoal(goal))
+              this.props.dispatch(handleDeleteGoal(goal))
            }
             render(){
                 return (
@@ -297,19 +302,24 @@
                 )
             }
         }
+        
+        const ConnectedGoals = connect((state) =>( {
+            // ** whenever we make a connector, this component will access to the dispatch
+            goals: state.goals
+        }))(Goals)
 
         class App extends React.Component {
 
             componentDidMount () {
-            const { store } = this.props
+            const { dispatch } = this.props
+            
             // fetch the data from API
-            store.dispatch(handleInitialData())
+            dispatch(handleInitialData())
            
-            store.subscribe(() => this.forceUpdate()) // will cause a rerender everytime store updates
+      //with connector, subscribe is uncesessary // store.subscribe(() => this.forceUpdate()) // will cause a rerender everytime store updates
       }
             render(){
-                const { store } = this.props 
-                const { todos, goals, loading } = store.getState()
+                const { loading } = this.props // it comes from connector now //.store.getState()
                 if(loading){
                 return (
                     <h3>Loading..</h3>
@@ -317,15 +327,70 @@
             }
                 return (
                     <div>
-                        <Todo todos={todos} store={store}/>
-                        <Goal goals={goals} store={store}/>
+                        <ConnectedTodos/>
+                        <ConnectedGoals/>
                     </div>
+                )
+            }
+        }
+        const ConnectedApp = connect((state) => ({ // always will take the entire state as parameter
+           //we passing what data App component needs to be rendered
+           loading : state.loading}))(App)
+
+
+        const Context = React.createContext()
+        function connect(mapStateToProps){
+           // connect() will return a function so you need to invoke that returned function to make a connection with redux. connect()(App)
+           // it will return a function which will render a component with a parameter
+           return (Component) => {
+
+            class Receiver extends React.Component {
+          componentDidMount() {
+            const { subscribe } = this.props.store
+
+            this.unsubcribe = subscribe(() => this.forceUpdate())
+          }
+          componentWillUnmount() {
+            this.unsubcribe()
+          }
+          render() {
+            const { dispatch, getState } = this.props.store
+            const state = getState()
+            const stateNeeded = mapStateToProps(state)
+
+            return <Component {...stateNeeded} dispatch={dispatch} />
+          }
+        }
+               class ConnectedComponent extends React.Component{
+                   render() {
+                       return (
+                           <Context.Consumer>
+                            {(store) => <Receiver store={store}/>}
+                            </Context.Consumer>
+                       )
+                   }
+
+               }
+               return ConnectedComponent // will return a brand new component 
+           }
+       }
+
+      
+        class Provider extends React.Component{
+            //any child component using react.consumer will be able to reach the value which is store
+            render(){
+                return (
+                    <Context.Provider value={this.props.store}>
+                        {this.props.children}
+                        </Context.Provider>
                 )
             }
         }
 
         ReactDOM.render(
-            <App store ={store}/>,
+            <Provider  store ={store}>
+            <ConnectedApp /> 
+            </Provider>,
             document.getElementById('app')
         )
         </script>
