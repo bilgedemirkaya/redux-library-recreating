@@ -1,4 +1,6 @@
-** To start the project ``` npm run start ```
+# To start the project 
+
+``` npm run start ```
 
 It is a project made for using redux in a react app properly 
 
