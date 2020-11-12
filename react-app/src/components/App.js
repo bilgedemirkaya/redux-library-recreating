@@ -5,17 +5,17 @@ import { useSelector, useDispatch } from 'react-redux'
 import { handleInitialData } from '../actions/shared'
 
 export default function App () {
-  const dispatch = useDispatch()
-  const loading = useSelector((state) => state.loading)
+  const dispatch = useDispatch() //coming from react-redux
+  const loading = useSelector((state) => state.loading) // connector to store
+  console.log(loading)
 
   React.useEffect(() => {
-    dispatch(handleInitialData())
+    dispatch(handleInitialData()) // handle side effects
   }, [dispatch])
 
   if (loading === true) {
-    return <h3>Loading</h3>
+    return <h3>Loading...</h3>
   }
-
   return (
     <div>
       <ConnectedTodos />
