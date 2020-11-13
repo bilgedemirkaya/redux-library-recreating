@@ -4,7 +4,7 @@ import {showLoading, hideLoading } from 'react-redux-loading'
 export const RECEIVE_POLLS = 'RECEIVE_POLLS'
 export const ADD_POLL = 'ADD_POLL'
 
-export default function receivePolls (polls) {
+export function receivePolls (polls) {
     return {
         type: RECEIVE_POLLS,
         polls

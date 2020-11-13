@@ -21,6 +21,16 @@ let users = {
     },
     polls: ['loxhs1bqm25b708cmbf3g', 'vthrdm985a262al8qx3do'],
   },
+  bilgedemirkaya: {
+    id: 'bilgedemirkaya',
+    name: 'Bilge Demirkaya',
+    avatarURL: '',
+    answers: {
+      "vthrdm985a262al8qx3do": 'a',
+      "xj352vofupe1dqz9emx13r": 'a',
+    },
+    polls: ['loxhs1bqm25b708cmbf3g', 'vthrdm985a262al8qx3do'],
+  },
   dan_abramov: {
     id: 'dan_abramov',
     name: 'Dan Abramov',
