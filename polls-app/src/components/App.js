@@ -1,6 +1,9 @@
 import * as React from 'react'
 import {useSelector,useDispatch, Provider} from 'react-redux'
 import { handleInitialData } from '../actions/shared'
+import LeaderBoard from './Leaderboard'
+import DashBoard from './Dashboard'
+import {BrowserRouter as Router} from 'react-router-dom'
 
 export default function App() {
   const dispatch = useDispatch()
@@ -11,8 +14,10 @@ export default function App() {
   },[dispatch])
 
   return (
+    <Router>
     <div className="container">
-      {loading ? <h1>Loading...</h1> : <div> Redux Polls </div>}
+      {loading ? <h1>Loading...</h1> : <DashBoard />}
     </div>
+    </Router>
   )
 }
