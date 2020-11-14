@@ -23,13 +23,12 @@ export default function AddPoll () {
 
     }
 
-    const handleInputChange = (target) =>{
+    const handleInputChange = ({target}) =>{
         const { value, name} = target
 
         setOption({
             ...option,
             [name] : value,
-  
         })
 
     }
