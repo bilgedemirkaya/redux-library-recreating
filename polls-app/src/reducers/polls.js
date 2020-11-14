@@ -14,7 +14,7 @@ export default function polls (state={},action) {
                 [action.poll.id] : action.poll
             }
         case ADD_ANSWER:
-            const {answer,id,authedUser} = action.poll
+            const {authedUser,id,answer} = action
             const poll = state[id]
             const keyVotes = answer + 'Votes'
             return {
