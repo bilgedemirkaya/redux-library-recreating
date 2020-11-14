@@ -2,6 +2,9 @@ import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import './index.css'
 import App from './components/App'
+import {createStore} from 'redux'
+import {Provider} from 'react-redux'
+import reducer from  './reducers' //we need to import our root reducer which is index folder
 
 function ColorfulBorder() {
   return (
@@ -16,11 +19,14 @@ function ColorfulBorder() {
     </React.Fragment>
   )
 }
+const store = createStore(
+  reducer
+) // we will ad middlewares here later on
 
 ReactDOM.render(
-  <React.StrictMode>
+  <Provider store = {store}>
     <ColorfulBorder />
     <App />
-  </React.StrictMode>,
+  </Provider>,
   document.getElementById('root')
 )

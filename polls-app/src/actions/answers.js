@@ -14,8 +14,7 @@ export function addAnswer ({authedUser,id, answer}) {
 }
 
 export function handleAnswer (answerData){
-    return (dispatch) => {
-        
+    return (dispatch) => {      
         dispatch(showLoading)
         savePollAnswer(answerData)
         .then(()=>dispatch(addAnswer(answerData)))
