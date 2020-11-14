@@ -4,6 +4,7 @@ import { handleInitialData } from '../actions/shared'
 import LeaderBoard from './Leaderboard'
 import DashBoard from './Dashboard'
 import {BrowserRouter as Router} from 'react-router-dom'
+import AddPoal from './Addpoll'
 
 export default function App() {
   const dispatch = useDispatch()
@@ -16,7 +17,7 @@ export default function App() {
   return (
     <Router>
     <div className="container">
-      {loading ? <h1>Loading...</h1> : <DashBoard />}
+      {loading ? <h1>Loading...</h1> : <AddPoal />}
     </div>
     </Router>
   )
