@@ -1,9 +1,17 @@
-export const GET_INITIAL_DATA = 'GET_INITIAL_DATA'
+import { getInitialData } from '../utils/api'
+import { receiveusers } from './users'
+import { receivetweets } from './tweets'
+import { setAuthedUser } from './autheduser'
 
-export default function getData (data) {
-    return {
-        type: GET_INITIAL_DATA,
-        data
+const hodja = "tylermcginnis"
 
+export function handleInitialData () {
+    return (dispatch) => {
+        return getInitialData()
+        .then(({users, tweets}) => {
+            dispatch(receiveusers(users))
+            dispatch(receivetweets(tweets))
+            dispatch(setAuthedUser(hodja))
+        })
     }
 }

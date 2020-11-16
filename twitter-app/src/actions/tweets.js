@@ -1,10 +1,9 @@
-import { RECEIVE_USERS } from "./users"
 
 export const RECEIVE_TWEETS = 'RECEIVE_TWEETS'
 
-export default function receivetweets (tweets) {
+export function receivetweets (tweets) {
     return {
-        type: RECEIVE_USERS,
+        type: RECEIVE_TWEETS,
         tweets
     }
 }

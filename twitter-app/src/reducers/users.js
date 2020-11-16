@@ -2,7 +2,7 @@ import {RECEIVE_USERS} from '../actions/users'
 
 // we will get this func with an action our hand. 
 // it will carry a type of action as well as the users property which carries our users data 
-export default function receiveUsers (state = {}, action) {
+export default function receiveusers (state = {}, action) {
     switch(action.type){
         case RECEIVE_USERS:
             return {

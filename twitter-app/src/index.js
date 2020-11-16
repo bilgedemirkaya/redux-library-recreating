@@ -5,6 +5,7 @@ import App from './components/App'
 import {createStore} from 'redux'
 import {Provider} from 'react-redux'
 import reducer from  './reducers' //we need to import our root reducer which is index folder
+import middleware from './middleware'
 
 function ColorfulBorder() {
   return (
@@ -20,8 +21,9 @@ function ColorfulBorder() {
   )
 }
 const store = createStore(
-  reducer
-) // we will ad middlewares here later on
+  reducer,
+  middleware
+)
 
 ReactDOM.render(
   <Provider store = {store}>
