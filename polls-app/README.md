@@ -9,11 +9,6 @@
 
 <h3 align="center">Redux Course Project #2 - <a href="https://ui-polls.netlify.app/">Polls</a></h3>
 
-### Info
-
-This is the repository for [UI.dev](https://ui.dev)'s "Redux #2" course project.
-
-For more information on the course, visit __[ui.dev/redux](https://ui.dev/redux/)__.
 
 ### Project
 
